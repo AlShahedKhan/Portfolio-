@@ -18,7 +18,16 @@ class ProjectsController
 
         return Inertia::render('Public/Projects/Index', [
             'filters' => $filters,
-            'projects' => ProjectResource::collection($projects),
+            'projects' => [
+                'data' => ProjectResource::collection($projects)->resolve(),
+                'links' => $projects->linkCollection()->toArray(),
+                'meta' => [
+                    'current_page' => $projects->currentPage(),
+                    'last_page' => $projects->lastPage(),
+                    'per_page' => $projects->perPage(),
+                    'total' => $projects->total(),
+                ],
+            ],
         ]);
     }
 

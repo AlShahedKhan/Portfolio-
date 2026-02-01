@@ -19,7 +19,16 @@ class BlogController
 
         return Inertia::render('Public/Blog/Index', [
             'filters' => $filters,
-            'posts' => BlogPostResource::collection($posts),
+            'posts' => [
+                'data' => BlogPostResource::collection($posts)->resolve(),
+                'links' => $posts->linkCollection()->toArray(),
+                'meta' => [
+                    'current_page' => $posts->currentPage(),
+                    'last_page' => $posts->lastPage(),
+                    'per_page' => $posts->perPage(),
+                    'total' => $posts->total(),
+                ],
+            ],
         ]);
     }
 

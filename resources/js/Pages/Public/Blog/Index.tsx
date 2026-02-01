@@ -13,9 +13,11 @@ export default function BlogIndex({ posts, filters }: {
 }) {
     const paginationLinks = Array.isArray(posts.links)
         ? posts.links
-        : Array.isArray(posts.meta?.links)
-            ? posts.meta?.links
-            : [];
+        : Array.isArray((posts as { links?: { data?: unknown } }).links?.data)
+            ? (posts as { links?: { data?: { url: string | null; label: string; active: boolean }[] } }).links?.data ?? []
+            : Array.isArray(posts.meta?.links)
+                ? posts.meta?.links
+                : [];
     const [search, setSearch] = useState(filters.search ?? '');
 
     const submit = (e: FormEvent) => {

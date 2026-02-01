@@ -14,9 +14,11 @@ export default function ProjectsIndex({ projects, filters }: {
 }) {
     const paginationLinks = Array.isArray(projects.links)
         ? projects.links
-        : Array.isArray(projects.meta?.links)
-            ? projects.meta?.links
-            : [];
+        : Array.isArray((projects as { links?: { data?: unknown } }).links?.data)
+            ? (projects as { links?: { data?: { url: string | null; label: string; active: boolean }[] } }).links?.data ?? []
+            : Array.isArray(projects.meta?.links)
+                ? projects.meta?.links
+                : [];
     const [search, setSearch] = useState(filters.search ?? '');
     const [tech, setTech] = useState(filters.tech ?? '');
     const [featured, setFeatured] = useState(filters.featured === 'true');
