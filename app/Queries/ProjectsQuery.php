@@ -5,17 +5,20 @@ namespace App\Queries;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class ProjectsQuery
 {
     public function handle(array $filters): LengthAwarePaginator
     {
+        $searchOperator = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+
         return Project::query()
             ->with('media')
-            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
-                $query->where(function (Builder $query) use ($search) {
-                    $query->where('title', 'ilike', "%{$search}%")
-                        ->orWhere('summary', 'ilike', "%{$search}%");
+            ->when($filters['search'] ?? null, function (Builder $query, string $search) use ($searchOperator) {
+                $query->where(function (Builder $query) use ($search, $searchOperator) {
+                    $query->where('title', $searchOperator, "%{$search}%")
+                        ->orWhere('summary', $searchOperator, "%{$search}%");
                 });
             })
             ->when($filters['tech'] ?? null, function (Builder $query, string $tech) {
